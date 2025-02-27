@@ -23,6 +23,9 @@ src_install() {
 	newbin "${DISTDIR}/${P}" $PN
 
 	domenu "${FILESDIR}/${PN}-lutris.desktop"
+	domenu "${FILESDIR}/${PN}-steam.desktop"
+	domenu "${FILESDIR}/${PN}-bottles.desktop"
+	domenu "${FILESDIR}/${PN}-nautilus.desktop"
 }
 pkg_postinst() {
 	einfo "How to use: $ ${NAME} [command] [command_arguments]"
