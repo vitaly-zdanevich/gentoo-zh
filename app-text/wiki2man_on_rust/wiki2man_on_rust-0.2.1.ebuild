@@ -164,15 +164,30 @@ src_compile() {
 src_install() {
 	dobin "target/release/${PN}"
 
-	local wiki l10n_code
+	local wiki l10n_code manpath_dirs=()
 	for wiki in "${WIKIS[@]}"; do
 		IFS=":" read -r l10n_code _ <<< "${wiki}"
 		if use "l10n_${l10n_code}"; then
-			insinto "/usr/share/man/${l10n_code}/man7"
-			find "${S}/man_pages/${l10n_code}/man7" -maxdepth 1 -type f -name '*.7' \
-				-exec doins {} + || die "failed to install ${l10n_code} man pages"
+			einfo "Installing ${l10n_code} man pages..."
+			insinto "/usr/share/man/${l10n_code}"
+			# Use doins -r or cp -a to preserve the shard/man7 structure
+			cp -a "${S}/man_pages/${l10n_code}"/* "${ED}/usr/share/man/${l10n_code}/" || die
+
+			local shard_dir
+			for shard_dir in "${ED}/usr/share/man/${l10n_code}"/*; do
+				if [[ -d "${shard_dir}/man7" ]]; then
+					manpath_dirs+=( "${shard_dir#${ED}}" )
+				fi
+			done
 		fi
 	done
+
+	if [[ ${#manpath_dirs[@]} -gt 0 ]]; then
+		(
+			echo "MANPATH=\"$(IFS=:; echo "${manpath_dirs[*]}")\""
+		) > "${T}/99wiki2man" || die
+		doenvd "${T}/99wiki2man"
+	fi
 }
 
 pkg_postinst() {
