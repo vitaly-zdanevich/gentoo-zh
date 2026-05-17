@@ -46,11 +46,16 @@ jobs:
             --repo . \
             --repo-url "https://github.com/${{ github.repository }}" \
             --output "public/gentoo-zh.rss"
+          printf '%s\n' \
+            '<!doctype html>' \
+            '<meta charset="utf-8">' \
+            '<title>gentoo-zh new packages RSS</title>' \
+            '<a href="./gentoo-zh.rss">gentoo-zh.rss</a>' \
+            > public/index.html
+          touch public/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
