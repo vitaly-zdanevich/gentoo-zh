@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GENERATOR_VERSION: v0.4.2
+  GENERATOR_VERSION: v0.6.0
   GENERATOR_BINARY: gentoo-overlay-new-packages-to-rss-linux-x86_64
 
 jobs:
@@ -41,12 +41,15 @@ jobs:
           chmod +x "${GENERATOR_BINARY}"
 
       - name: Generate RSS
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           ./${GENERATOR_BINARY} \
             --repo . \
             --repo-url "https://github.com/${{ github.repository }}" \
             --self-url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/gentoo-zh.rss" \
             --list-patches \
+            --github-author-links \
             --output "public/gentoo-zh.rss"
           printf '%s\n' \
             '<!doctype html>' \
